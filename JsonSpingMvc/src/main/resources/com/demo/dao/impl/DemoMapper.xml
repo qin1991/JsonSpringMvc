@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.web.student.dao.StudentDao">
+
+    <resultMap id="studentResultMap" type="Student">
+        <id property="stuId" column="stu_id" jdbcType="INTEGER"/>
+        <result property="stuNumber" column="stu_number" jdbcType="VARCHAR"/>
+        <result property="stuPassword" column="stu_password" jdbcType="VARCHAR"/>
+        <result property="stuName" column="stu_name" jdbcType="VARCHAR"/>
+        <result property="stuSex" column="stu_sex" jdbcType="VARCHAR"/>
+        <result property="stuAge" column="stu_age" jdbcType="INTEGER"/>
+        <result property="stuNote" column="stu_note" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="DATE"/>
+        <result property="updateTime" column="update_time" jdbcType="DATE"/>
+    </resultMap>
+
+
+    <select id="getStudentByNumberAndPwd" parameterType="map" resultMap="studentResultMap">
+        select stu_id,stu_number,stu_password,stu_name,stu_sex,stu_age,stu_note,create_time,update_time FROM student
+        <trim prefix="where" prefixOverrides="and">
+            <if test="stuNumber!=null and stuNumber!=''">
+                 stu_number=#{stuNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="stuPassword!=null and stuPassword!=''">
+                and stu_password=#{stuPassword,jdbcType=VARCHAR}
+            </if>
+        </trim>
+    </select>
+
+    <select id="getStudentByStuNumber" parameterType="map" resultMap="studentResultMap">
+        select stu_id,stu_number,stu_password,stu_name,stu_sex,stu_age,stu_note,create_time,update_time FROM student
+        <trim prefix="where" prefixOverrides="and">
+            <if test="stuNumber!=null">
+                and stu_number like   concat('%',#{stuNumber,jdbcType=VARCHAR},'%')
+            </if>
+        </trim>
+    </select>
+
+    <select id="findStudentById" parameterType="map" resultMap="studentResultMap">
+        select stu_id,stu_number,stu_password,stu_name,stu_sex,stu_age,stu_note,create_time,update_time FROM student
+        where stu_id=#{stuId,jdbcType=INTEGER}
+    </select>
+
+    <insert id="addStudent" parameterType="Student">
+        insert into student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stuNumber != null">stu_number,</if>
+            <if test="stuPassword != null">stu_password,</if>
+            <if test="stuName != null">stu_name,</if>
+            <if test="stuSex != null">stu_sex,</if>
+            <if test="stuAge != null">stu_age,</if>
+            <if test="stuNote != null">stu_note,</if>
+            create_time,
+            update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stuNumber != null">
+                #{stuNumber, jdbcType=VARCHAR},
+            </if>
+            <if test="stuPassword != null">
+                #{stuPassword, jdbcType=VARCHAR},
+            </if>
+            <if test="stuName != null">
+                #{stuName, jdbcType=VARCHAR},
+            </if>
+            <if test="stuSex != null">
+                #{stuSex, jdbcType=VARCHAR},
+            </if>
+            <if test="stuAge != null">
+                #{stuAge, jdbcType=INTEGER},
+            </if>
+            <if test="stuNote != null">
+                #{stuNote, jdbcType=VARCHAR},
+            </if>
+            now(),
+            now()
+        </trim>
+        <selectKey resultType="java.lang.Integer" keyProperty="stuId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <delete id="deleteStudentById" parameterType="map">
+        delete from student where   stu_id=#{stuId, jdbcType=INTEGER}
+    </delete>
+
+    <update id="updateStudentById" parameterType="Student">
+        update student
+        <set>
+            <if test="stuPassword != null">
+                stu_password=#{stuPassword, jdbcType=VARCHAR},
+            </if>
+            <if test="stuName != null">
+                stu_name = #{stuName, jdbcType=VARCHAR},
+            </if>
+            <if test="stuSex != null">
+                stu_sex = #{stuSex, jdbcType=VARCHAR},
+            </if>
+            <if test="stuAge != null">
+               stu_age =  #{stuAge, jdbcType=INTEGER},
+            </if>
+            <if test="stuNote != null">
+                stu_note = #{stuNote, jdbcType=VARCHAR},
+            </if>
+            update_time = now()
+        </set>
+        where stu_id=#{stuId}
+    </update>
+
+</mapper>
